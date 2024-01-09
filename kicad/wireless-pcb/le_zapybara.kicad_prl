@@ -7,7 +7,7 @@
     "hidden_nets": [
       "AMUX_SEL_1"
     ],
-    "high_contrast_mode": 0,
+    "high_contrast_mode": 1,
     "net_color_mode": 2,
     "opacity": {
       "images": 0.7799999713897705,
