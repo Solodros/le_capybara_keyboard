@@ -1,49 +1,223 @@
+# Gerber and drill files for JLCPCB, without stencil
+# URL: https://jlcpcb.com/
+# Based on setting used by Gerber Zipper (https://github.com/g200kg/kicad-gerberzipper)
 kibot:
   version: 1
 
-preflight:
-  fill_zones: true
+filters:
+  - name: fix_rotation
+    comment: 'Adjust rotation for JLC'
+    type: rot_footprint
+    negative_bottom: false
+    invert_bottom: true
+    rotations:
+      - ["^D_.*", 180.0]
+      - ["^USB4510.*", 180.0]
+        #       - ["^SOIC-16*", 270.0]
+        #       - ["^SOT-23", 0.0]
+        #       - ["^SW_SPDT_PCM12", 180.0]
+        #       - ["^Panasonic_EVQPUL_.*", 90.0]
+        #       - ["^R_.*", 180.0]
+
+  - name: only_jlc_parts
+    comment: 'Only parts with JLC code'
+    type: generic
+    include_only:
+      - column: 'LCSC'
+        regex: '^C\d+'
+
+  - name: mechanical_fixed
+    comment: 'Exclude mechanical, but fix for reverse mount LED'
+    type: generic
+    exclude_virtual: true
+    exclude_any:
+      - column: 'Ref'
+        regex: '^TP[0-9]*'
+      - column: 'Ref'
+        regex: '^FID'
+      - column: 'Part'
+        regex: 'solder.*bridge'
+      - column: 'Part'
+        regex: 'solder.*jump'
+      - column: 'Part'
+        regex: 'test.*point'
+      - column: 'FP'
+        regex: 'test.*point'
+      - column: 'FP'
+        regex: 'fiducial'
+
+variants:
+  - name: rotated
+    comment: 'Just a place holder for the rotation filter'
+    type: kibom
+    variant: rotated
+    pre_transform: fix_rotation
+    exclude_filter: mechanical_fixed
 
 outputs:
-  - name: edge_cut
-    comment: PCB edge cut
-    type: dxf
-    options:
-      metric_units: true
-      polygon_mode: false
-      use_aux_axis_as_origin: true
+  - name: gerbers
+    comment: Gerbers compatible with JLCPCB
+    type: gerber
+    dir: Gerbers
+    options: &gerber_options
+      exclude_edge_layer: true
+      exclude_pads_from_silkscreen: true
+      plot_sheet_reference: false
+      plot_footprint_refs: true
+      plot_footprint_values: false
+      force_plot_invisible_refs_vals: false
+      tent_vias: true
+      use_protel_extensions: true
+      create_gerber_job_file: false
+      disable_aperture_macros: true
+      gerber_precision: 4.6
+      use_gerber_x2_attributes: false
+      use_gerber_net_attributes: false
+      line_width: 0.1
+      subtract_mask_from_silk: true
+      inner_extension_pattern: '.gp%n'
     layers:
-       - Edge.Cuts
+      # Note: a more generic approach is to use 'copper' but then the filenames
+      # are slightly different.
+      - F.Cu
+      - B.Cu
+      - In1.Cu
+      - In2.Cu
+      - In3.Cu
+      - In4.Cu
+      - In5.Cu
+      - In6.Cu
+      - F.SilkS
+      - B.SilkS
+      - F.Mask
+      - B.Mask
+      - Edge.Cuts
 
-  - name: schematic
-    comment: "pdf schematic"
-    type: pdf_sch_print
+  - name: drill_file
+    comment: Drill files compatible with JLCPCB
+    type: excellon
+    dir: Gerbers
+    options:
+      pth_and_npth_single_file: false
+      pth_id: '-PTH'
+      npth_id: '-NPTH'
+      metric_units: true
+      map: gerber
+      route_mode_for_oval_holes: false
+      output: "%f%i.%x"
 
-  - name: 'ibom'
-    comment: "interactive BOM html"
-    type: ibom
+  - name: gerber_zip
+    comment: ZIP file for Manu
+    type: compress
+    dir: Gerbers
+    options:
+      files:
+        - from_output: gerbers
+          dest: /
+        - from_output: drill_file
+          dest: /
+
+  - name: support_zip
+    comment: Support ZIP file for Manu
+    type: compress
+    options:
+      files:
+        - from_output: generic_position
+          dest: /
+
+  - name: generic_position
+    comment: Pick and place position file compatible
+    type: position
+    options:
+      variant: rotated
+      output: '%f_cpl.%x'
+      format: CSV
+      units: millimeters
+      separate_files_for_front_and_back: false
+      only_smd: true
+      columns:
+        - id: Ref
+          name: Designator
+        - Val
+        - Package
+        - id: PosX
+          name: "Mid X"
+        - id: PosY
+          name: "Mid Y"
+        - id: Rot
+          name: Rotation
+        - id: Side
+          name: Layer
+
+  - name: JLCPCB_position
+    comment: Pick and place position file compatible with JLCPCB
+    type: position
+    options:
+      variant: rotated
+      output: '%f_cpl_jlc.%x'
+      format: CSV
+      units: millimeters
+      separate_files_for_front_and_back: false
+      only_smd: true
+      columns:
+        - id: Ref
+          name: Designator
+        - Val
+        - Package
+        - id: PosX
+          name: "Mid X"
+        - id: PosY
+          name: "Mid Y"
+        - id: Rot
+          name: Rotation
+        - id: Side
+          name: Layer
+
+  - name: 'bom_generic'
+    comment: "Generic BoM"
+    type: bom
+    options:
+      format: 'XLSX'
+      output: '%f_%i.%x'
+      ref_separator: ','
+      group_fields: ['Value', 'Footprint', 'MPN']
+      columns:
+        - field: Value
+          name: Comment
+        - field: References
+          name: Designator
+        - field: Footprint
+          name: Footprint
+        - field: 'MPN'
+          name: 'Manufacturer Part Number'
+      xlsx:
+        logo: false
+
+  - name: 'bom'
+    comment: "BoM for JLC"
+    type: bom
+    options:
+      output: '%f_%i_jlc.%x'
+        # exclude_filter: 'only_jlc_parts'
+      ref_separator: ','
+      group_fields: ['Value', 'Footprint', 'LCSC']
+      columns:
+        - field: Value
+          name: Comment
+        - field: References
+          name: Designator
+        - field: Footprint
+          name: Footprint
+        - field: 'LCSC'
+          name: 'LCSC Part #'
+      csv:
+        hide_pcb_info: true
+        hide_stats_info: true
+        quote_all: true
 
   - name: 'step'
-    comment: "PCB STEP file"
+    comment: "STEP file for case design testing"
     type: step
+    run_by_default: false
     options:
-      min_distance: 0.01
-
-  - name: pcb_top_g
-    comment: "2D Renders - top"
-    type: pcbdraw
-    options:
-      output: "%f-%i.%x"
-      format: jpg
-      show_components: all
-      dpi: 600
-
-  - name: pcb_bot_g
-    comment: "2D Renders - bottom"
-    type: pcbdraw
-    options:
-      output: "%f-%i.%x"
-      format: jpg
-      bottom: True
-      show_components: all
-      dpi: 600
+      min_distance: 0.1

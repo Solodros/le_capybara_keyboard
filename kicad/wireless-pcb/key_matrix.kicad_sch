@@ -1591,7 +1591,7 @@
   )
 
   (symbol (lib_id "Jumper:Jumper_2_Open") (at 106.426 127.508 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 02159002-695c-4acb-9eff-6f444f821006)
     (property "Reference" "JP1" (at 106.426 120.396 0)
       (effects (font (size 1.27 1.27)))
@@ -2184,7 +2184,7 @@
   )
 
   (symbol (lib_id "cipulot_parts:EC_SW") (at 231.14 147.32 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 5708681e-8fb4-4824-9167-80f1d4854186)
     (property "Reference" "SW3" (at 231.14 140.97 0)
       (effects (font (size 1.27 1.27)))
@@ -2618,7 +2618,7 @@
   )
 
   (symbol (lib_id "cipulot_parts:EC_SW") (at 193.04 147.32 0) (mirror y) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 998a13da-2584-4e14-9521-60077759c3e9)
     (property "Reference" "SW3" (at 193.04 140.97 0)
       (effects (font (size 1.27 1.27)))
@@ -2954,7 +2954,7 @@
   )
 
   (symbol (lib_id "cipulot_parts:EC_SW") (at 175.26 147.32 0) (mirror y) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid ba470351-6fab-4d6a-80a6-cf9c5cdcce14)
     (property "Reference" "SW3" (at 175.26 140.97 0)
       (effects (font (size 1.27 1.27)))
@@ -3238,7 +3238,7 @@
   )
 
   (symbol (lib_id "cipulot_parts:EC_SW") (at 213.36 147.32 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid e142fa2c-ad80-49bc-9201-6bf8dbc54162)
     (property "Reference" "SW3" (at 213.36 140.97 0)
       (effects (font (size 1.27 1.27)))
