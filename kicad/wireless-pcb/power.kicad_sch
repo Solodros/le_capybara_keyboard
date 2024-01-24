@@ -1459,7 +1459,7 @@
   )
 
   (symbol (lib_id "Jumper:Jumper_2_Bridged") (at 91.948 78.232 270) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 31fa5f1b-4d7b-43e4-9ec6-e514ad7349ae)
     (property "Reference" "JP2" (at 93.98 76.962 90)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -1857,7 +1857,7 @@
   )
 
   (symbol (lib_id "Jumper:Jumper_2_Bridged") (at 174.244 112.522 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 936a5e80-a7e2-4d95-a06f-2ab9e2268b9f)
     (property "Reference" "JP3" (at 174.244 106.68 0)
       (effects (font (size 1.27 1.27)))
